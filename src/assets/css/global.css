@@ -1,0 +1,30 @@
+/* global css */
+
+
+* {
+    background-color: #20232A;
+    color: rgb(250, 250, 250);
+    font-family: "Open Sans", sans-serif;
+    font-optical-sizing: auto;
+}
+
+/* .layout {
+    padding: 1em 0;
+} */
+
+.center-page {
+    text-align: center;
+}
+
+
+
+
+input {
+    border: 1px solid white;
+    padding: 0.5em;
+    height: 3em;
+}
+
+.fa-icon {
+    background-color: transparent;
+}
