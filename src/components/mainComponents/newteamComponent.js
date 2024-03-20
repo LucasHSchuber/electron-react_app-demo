@@ -12,14 +12,14 @@ function Newteam() {
         console.log('Submitting form:', name, workname, county);
         if (window.Bridge && window.Bridge.sendSubmit) {
             window.Bridge.sendSubmit({ name, workname, county });
+            setName('');
+            setWorkname('');
+            setCounty('');
         } else {
             console.log('Bridge or sendSubmit function not available');
         }
-        setName('');
-        setWorkname('');
-        setCounty('');
     };
-    
+
 
     return (
         <div>
