@@ -2,7 +2,6 @@ const path = require('path');
 const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const sqlite3 = require('sqlite3').verbose();
 
-
 // Construct the absolute path to the SQLite database file
 const dbPath = path.join(__dirname, '..', 'data', 'mydb.db');
 
@@ -22,29 +21,21 @@ function createTables() {
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      password TEXT NOT NULL
+      workname TEXT NOT NULL UNIQUE,
+      county TEXT NOT NULL
     )
   `, (err) => {
     if (err) {
       console.error('Error creating users table:', err.message);
     } else {
       console.log('Users table created successfully');
+      // Set up IPC event handler for adding users
+
     }
   });
 }
 
-// Handle IPC event to fetch users
-ipcMain.on('get-users', (event) => {
-  db.all('SELECT * FROM users', (err, rows) => {
-    if (err) {
-      console.error('Error fetching users:', err.message);
-      event.reply('get-users-response', { error: err.message });
-    } else {
-      event.reply('get-users-response', rows);
-    }
-  });
-});
+
 
 import('electron-is-dev').then((isDev) => {
   // Initialize mainWindow variable
@@ -66,6 +57,36 @@ import('electron-is-dev').then((isDev) => {
         autoHideMenuBar: true,
       },
     });
+
+    // Handle IPC event to fetch users
+    ipcMain.on('get-users', (event) => {
+      db.all('SELECT * FROM users', (err, rows) => {
+        if (err) {
+          console.error('Error fetching users:', err.message);
+          event.reply('get-users-response', { error: err.message });
+        } else {
+          event.reply('get-users-response', rows);
+        }
+      });
+    });
+    // Set up IPC event handler for adding users
+
+    ipcMain.on('add-user', (event, userData) => {
+      const { name, workname, county } = userData;
+      db.run(`
+      INSERT INTO users (name, workname, county)
+      VALUES (?, ?, ?)
+    `, [name, workname, county], (err) => {
+        if (err) {
+          console.error('Error adding user data:', err.message);
+          event.reply('add-user-response', { error: err.message });
+        } else {
+          console.log('User data added successfully');
+          event.reply('add-user-response', { success: true });
+        }
+      });
+    });
+
 
 
     // Create a custom menu template

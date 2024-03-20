@@ -40,6 +40,9 @@ function Portal() {
     const navigateToIndex = () => {
         Navigate('/index');
     }
+    const navigateToNewTeam = () => {
+        Navigate('/newteam');
+    }
 
    
 
@@ -54,7 +57,7 @@ function Portal() {
             </div>
             <div className='my-4'>
                 <button className='button standard forced-width mx-1' >Skicka data</button>
-                <button className='button standard forced-width mx-1' >Nytt lag</button>
+                <button className='button standard forced-width mx-1' onClick={navigateToNewTeam}>Nytt lag</button>
             </div>
             <div>
                 <h5>Dina jobb <span style={{ fontSize: "0.9em" }} ><em>({todayDate})</em></span></h5>

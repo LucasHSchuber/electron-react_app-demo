@@ -1,6 +1,7 @@
 // preload.js
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer } = require('electron');
 const os = require("os");
+
 
 console.log("Preload script loaded");
 
@@ -9,6 +10,19 @@ contextBridge.exposeInMainWorld('electron', {
     osVersion: () => os.version(),
     arch: () => os.arch(),
 });
+
+
+
+
+let sendSubmit = (lead) => {
+    ipcRenderer.send("add-user", lead);
+}
+let indexBridge = {
+    sendSubmit: sendSubmit
+}
+contextBridge.exposeInMainWorld("Bridge", indexBridge)
+
+
 
 
 contextBridge.exposeInMainWorld('ipcRenderer', {

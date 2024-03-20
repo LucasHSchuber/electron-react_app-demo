@@ -5,6 +5,7 @@ import Header from './components/headerComponents/headerComponent';
 import Home from './components/mainComponents/homeComponent';
 import Index from './components/mainComponents/indexComponent';
 import Portal from './components/mainComponents/portalComponent';
+import Newteam from './components/mainComponents/newteamComponent';
 
 
 //importing css style
@@ -36,6 +37,11 @@ function App() {
         <div className='center-page'>
           <Routes>
             <Route path='/portal' element={<Portal />} />
+          </Routes>
+        </div>
+        <div className='center-page'>
+          <Routes>
+            <Route path='/newteam' element={<Newteam />} />
           </Routes>
         </div>
 
