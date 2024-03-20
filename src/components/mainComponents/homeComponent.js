@@ -1,14 +1,22 @@
 // components/Home.js
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 import logo from "../../assets/images/logo512.png"
 import soccerball from "../../assets/images/soccer-ball.png"
 
+
+
+
 function Home() {
     //define states
+    const [homeDir, setHomeDir] = useState('');
+    const [arch, setArch] = useState('');
+    const [osVersion, setOsVersion] = useState('');
 
+    
 
     const Navigate = useNavigate();
 
@@ -16,6 +24,23 @@ function Home() {
     const navigateToIndex = () => {
         Navigate('/index');
     }
+
+    useEffect(() => {
+        // Access the exposed electron object
+        if (window.electron) {
+            // Call the homeDir function
+            const homedir = window.electron.homeDir();
+            const arch = window.electron.arch();
+            const osVersion = window.electron.osVersion();
+            setHomeDir(homedir);
+            setArch(arch);
+            setOsVersion(osVersion);
+        }
+    }, []);
+
+
+
+
 
 
     return (
@@ -36,6 +61,13 @@ function Home() {
                     <option>Norska</option>
                 </select>
             </div>
+
+            <div className='mt-4'>
+                <h6>Home Directory: <em>{homeDir}</em></h6>
+                <h6>OS arch: <em>{arch}</em></h6>
+                <h6>OS version: <em>{osVersion}</em></h6>
+            </div>
+
         </div>
     );
 }

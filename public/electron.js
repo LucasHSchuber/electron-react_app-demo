@@ -1,5 +1,51 @@
 const path = require('path');
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
+const sqlite3 = require('sqlite3').verbose();
+
+
+// Construct the absolute path to the SQLite database file
+const dbPath = path.join(__dirname, '..', 'data', 'mydb.db');
+
+// Create or open SQLite database
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('Error opening database:', err.message);
+  } else {
+    console.log('Connected to SQLite database');
+    createTables(); // Call the function to create tables
+  }
+});
+
+// Function to create tables
+function createTables() {
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      password TEXT NOT NULL
+    )
+  `, (err) => {
+    if (err) {
+      console.error('Error creating users table:', err.message);
+    } else {
+      console.log('Users table created successfully');
+    }
+  });
+}
+
+// Handle IPC event to fetch users
+ipcMain.on('get-users', (event) => {
+  db.all('SELECT * FROM users', (err, rows) => {
+    if (err) {
+      console.error('Error fetching users:', err.message);
+      event.reply('get-users-response', { error: err.message });
+    } else {
+      event.reply('get-users-response', rows);
+    }
+  });
+});
+
 import('electron-is-dev').then((isDev) => {
   // Initialize mainWindow variable
   let mainWindow;
@@ -15,7 +61,8 @@ import('electron-is-dev').then((isDev) => {
       webPreferences: {
         nodeIntegration: true,
         enableRemoteModule: true,
-        contextIsolation: false,
+        contextIsolation: true,
+        preload: path.join(__dirname, 'preload.js'),
         autoHideMenuBar: true,
       },
     });
@@ -78,12 +125,23 @@ import('electron-is-dev').then((isDev) => {
   // Create the main window when the app is ready
   app.whenReady().then(createWindow);
 
-  // Quit the app when all windows are closed (except on macOS)
+  // Handle app quit
   app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      app.quit();
-    }
+    db.close((err) => {
+      if (err) {
+        console.error('Error closing database:', err.message);
+      } else {
+        console.log('Closed the database connection');
+      }
+    });
+    app.quit();
   });
+  // // Quit the app when all windows are closed (except on macOS)
+  // app.on('window-all-closed', () => {
+  //   if (process.platform !== 'darwin') {
+  //     app.quit();
+  //   }
+  // });
 
   // Create a new window when the app is activated (macOS)
   app.on('activate', () => {
